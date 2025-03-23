@@ -1,19 +1,20 @@
-#!/bin/bash
+FROM richarvey/nginx-php-fpm:3.1.6
 
-# Install Node.js dependencies
-npm install
+COPY . .
 
-# Build front-end assets
-npm run build
+# Image config
+ENV SKIP_COMPOSER 1
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
 
-# Install PHP dependencies (if using Composer)
-if [ -f "composer.json" ]; then
-    # Download Composer
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Laravel config
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
 
-    # Install PHP dependencies
-    php /usr/local/bin/composer install --optimize-autoloader --no-dev
-fi
+# Allow composer to run as root
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Start the Laravel development server (optional)
-# php artisan serve --host=0.0.0.0 --port=10000
+CMD ["/start.sh"]
