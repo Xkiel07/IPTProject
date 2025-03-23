@@ -34,26 +34,33 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Create a non-root user and set permissions
+RUN useradd -m -u 1000 -s /bin/bash laravel && \
+    mkdir -p /var/www/html && \
+    chown -R laravel:laravel /var/www/html
+
+# Switch to the non-root user
+USER laravel
+
 # Set the working directory
 WORKDIR /var/www/html
 
 # Copy composer.json and composer.lock
-COPY composer.json composer.lock ./
+COPY --chown=laravel:laravel composer.json composer.lock ./
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Copy the rest of the application files
-COPY . .
+COPY --chown=laravel:laravel . .
 
-# Copy Nginx configuration
+# Copy Nginx configuration (as root)
+USER root
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-
-# Copy Supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Set permissions for Laravel storage and bootstrap cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R laravel:laravel /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port 80
 EXPOSE 80
