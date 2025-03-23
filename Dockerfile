@@ -1,25 +1,35 @@
-FROM richarvey/nginx-php-fpm:1.7.2
+# Use a PHP 8.2 base image with Nginx and PHP-FPM
+FROM php:8.2-fpm
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    nginx \
+    supervisor \
+    && docker-php-ext-install pdo_mysql
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set the working directory
 WORKDIR /var/www/html
 
-# Print the working directory
-RUN pwd
-
-# List files in the working directory
-RUN ls -la
-
 # Copy composer.json and composer.lock
 COPY composer.json composer.lock ./
 
-# Install dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Copy the rest of the application files
 COPY . .
 
+# Copy Nginx configuration
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copy Supervisor configuration
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Expose port 80
 EXPOSE 80
 
-# Start services
-CMD ["supervisord", "-c", "/etc/supervisord.conf"]
+# Start Supervisor to manage Nginx and PHP-FPM
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
