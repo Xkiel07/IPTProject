@@ -1,44 +1,31 @@
-# Use an official PHP image as the base image
-FROM php:8.2-cli
+FROM richarvey/nginx-php-fpm:latest
 
-# Set the working directory
-WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libonig-dev \
-    libxml2-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libssl-dev \
-    libmcrypt-dev \
-    && docker-php-ext-install pdo_mysql zip mbstring exif pcntl bcmath gd
-
-# Install Node.js and npm (optional, for front-end assets)
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copy the Laravel application files
+# Copy your application files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Image config
+ENV SKIP_COMPOSER 1
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
 
-# Install npm dependencies (optional, for front-end assets)
-RUN npm install
+# Laravel config
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
 
-# Build assets (optional, for front-end assets)
-RUN npm run build
+# Allow composer to run as root
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Expose port 10000
-EXPOSE 10000
+# Expose the port (Render will use the PORT environment variable)
+EXPOSE $PORT
 
-# Start the Laravel development server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+# Create a startup script to replace ${PORT} in the Nginx configuration
+RUN echo "#!/bin/bash" > /start.sh && \
+    echo "sed -i \"s/\${PORT}/$PORT/g\" /etc/nginx/sites-enabled/default.conf" >> /start.sh && \
+    echo "nginx -g 'daemon off;'" >> /start.sh && \
+    chmod +x /start.sh
+
+# Run the startup script
+CMD ["/start.sh"]
