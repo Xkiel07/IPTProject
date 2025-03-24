@@ -45,18 +45,22 @@ USER laravel
 # Set the working directory
 WORKDIR /var/www/html
 
-# Copy composer.json and composer.lock
+# Copy composer.json and composer.lock first to leverage Docker cache
 COPY --chown=laravel:laravel composer.json composer.lock ./
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Copy the rest of the application files
+# Copy the rest of the application files (including artisan)
 COPY --chown=laravel:laravel . .
 
-# Copy Nginx configuration (as root)
+# Switch back to root for Nginx and Supervisor setup
 USER root
+
+# Copy Nginx configuration
 COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copy Supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Set permissions for Laravel storage and bootstrap cache
