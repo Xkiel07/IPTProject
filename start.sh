@@ -1,7 +1,6 @@
 #!/bin/bash
-# Start NGINX
-service nginx start
-# Start PHP-FPM
-service php-fpm start
-# Keep the container running
-tail -f /dev/null
+# Replace ${PORT} in the Nginx configuration with the value from the environment variable
+sed -i "s/\${PORT}/$PORT/g" /etc/nginx/nginx.conf
+
+# Start Nginx
+nginx -g "daemon off;"
