@@ -28,8 +28,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 ENV COMPOSER_MEMORY_LIMIT=-1
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copy only composer files first (for Docker cache)
-COPY composer.json composer.lock /var/www/html/
+# Copy the application files first (so the artisan file is available)
+COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html
@@ -43,9 +43,6 @@ RUN composer clear-cache
 
 # Install Laravel dependencies with more verbose output and memory limit adjustments
 RUN composer install --no-interaction --optimize-autoloader --no-dev --verbose
-
-# Copy the rest of the code after dependencies are installed
-COPY . /var/www/html
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
