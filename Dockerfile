@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install dependencies
+# Install dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
@@ -11,13 +11,14 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libonig-dev \
-    libgd-dev  # Install GD library for PHP
+    libgd-dev \
+    && rm -rf /var/lib/apt/lists/* # Clean up unnecessary apt cache
 
-# Enable Apache mod_rewrite
+# Enable Apache mod_rewrite and necessary PHP extensions
 RUN a2enmod rewrite
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql zip mbstring bcmath gd  # Add gd extension
+# Install PHP extensions: pdo_mysql, zip, mbstring, bcmath, and gd
+RUN docker-php-ext-install pdo_mysql zip mbstring bcmath gd
 
 # Set the Laravel public directory as the Apache root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -28,8 +29,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 ENV COMPOSER_MEMORY_LIMIT=-1
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copy the application files first (so the artisan file is available)
-COPY . /var/www/html/
+# Copy the application files (including composer.json, composer.lock) first
+COPY composer.json composer.lock /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html
@@ -41,8 +42,17 @@ RUN curl -sS https://getcomposer.org/installer | php && \
 # Clear Composer cache
 RUN composer clear-cache
 
-# Install Laravel dependencies with more verbose output and memory limit adjustments
+# Install Laravel dependencies (make sure 'artisan' is available)
 RUN composer install --no-interaction --optimize-autoloader --no-dev --verbose
 
-# Set correct permissions
+# Copy the rest of the application files after dependencies are installed
+COPY . /var/www/html/
+
+# Set correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Expose port 80
+EXPOSE 80
+
+# Start Apache server
+CMD ["apache2-foreground"]
