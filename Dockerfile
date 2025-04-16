@@ -13,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libgd-dev \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/* # Clean up unnecessary apt cache
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite and necessary PHP extensions
 RUN a2enmod rewrite
@@ -30,7 +32,7 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 ENV COMPOSER_MEMORY_LIMIT=-1
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copy the entire application files (including 'artisan' file) before installing dependencies
+# Copy the application files
 COPY . /var/www/html/
 
 # Set working directory
@@ -40,11 +42,11 @@ WORKDIR /var/www/html
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
 
-# Clear Composer cache
-RUN composer clear-cache
-
-# Install Laravel dependencies
+# Install PHP dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev --verbose
+
+# Install Node dependencies and build frontend assets
+RUN npm install && npm run build
 
 # Set correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
@@ -52,5 +54,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Expose port 80
 EXPOSE 80
 
-# Start Apache server
+# Run migrations first, then start Apache
 CMD php artisan migrate --force && apache2-foreground
