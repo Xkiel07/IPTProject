@@ -1,24 +1,34 @@
-FROM richarvey/nginx-php-fpm:latest
+FROM php:8.2-apache
 
-COPY . .
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    libzip-dev \
+    zip
 
-# Image config
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Enable mod_rewrite
+RUN a2enmod rewrite
 
-# Laravel config
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql zip
 
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Expose the correct port
-EXPOSE 10000
+# Copy the application code
+COPY . /var/www/html
 
-# Run the startup script
-CMD ["/start.sh"]
+# Set the working directory
+WORKDIR /var/www/html
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install project dependencies
+RUN composer install
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+chmod +x start.sh
