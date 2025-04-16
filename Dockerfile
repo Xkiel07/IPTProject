@@ -1,8 +1,16 @@
 FROM php:8.2-apache
 
 # Install dependencies
-RUN apt-get update && \
-    apt-get install -y libzip-dev zip unzip curl git libpng-dev libjpeg-dev libfreetype6-dev
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    curl \
+    git \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev  # Install the required oniguruma package for mbstring
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
