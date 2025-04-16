@@ -17,6 +17,19 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Add static files configuration
+RUN { \
+    echo '<Directory /var/www/html/public>'; \
+    echo '    Options FollowSymLinks'; \
+    echo '    AllowOverride All'; \
+    echo '    Require all granted'; \
+    echo '    <FilesMatch "\.(css|js|jpg|png|gif|ico|svg|woff2)$">'; \
+    echo '        Header set Cache-Control "max-age=31536000, public"'; \
+    echo '    </FilesMatch>'; \
+    echo '</Directory>'; \
+} > /etc/apache2/conf-available/laravel.conf && \
+    a2enconf laravel
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -24,9 +37,14 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY . /var/www/html/
 WORKDIR /var/www/html
 
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-RUN npm install && npm run build && npm cache clean --force
+# Install PHP dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
+
+# Install Node dependencies and build assets
+RUN npm install --no-audit --prefer-offline && \
+    npm run build && \
+    rm -rf node_modules && \
+    npm cache clean --force
 
 # Setup storage
 RUN mkdir -p /var/www/html/storage/framework/{cache,sessions,views} && \
@@ -47,4 +65,4 @@ RUN php artisan storage:link && \
 EXPOSE 80
 
 # Start command
-CMD bash -c "php artisan optimize && apache2-foreground"
+CMD ["apache2-foreground"]
