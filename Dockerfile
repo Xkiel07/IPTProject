@@ -15,8 +15,10 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Copy code and set working directory
-COPY . /var/www/html
+# Copy only composer files first (for Docker cache)
+COPY composer.json composer.lock /var/www/html/
+
+# Set working directory
 WORKDIR /var/www/html
 
 # Install Composer
@@ -25,6 +27,9 @@ RUN curl -sS https://getcomposer.org/installer | php && \
 
 # Install Laravel dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Copy the rest of the code after dependencies are installed
+COPY . /var/www/html
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
