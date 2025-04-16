@@ -17,66 +17,42 @@ RUN apt-get update && apt-get install -y \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache modules
-RUN a2enmod rewrite headers
+# Enable Apache mod_rewrite and necessary PHP extensions
+RUN a2enmod rewrite
 
-# Install PHP extensions
+# Install PHP extensions: pdo_mysql, pdo_pgsql, zip, mbstring, bcmath, and gd
 RUN docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd
 
-# Configure Apache
+# Set the Laravel public directory as the Apache root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Add Apache configuration for static files
-RUN echo "\
-<Directory /var/www/html/public>\n\
-    Options Indexes FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-    # Cache static assets\n\
-    <FilesMatch \"\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$\">\n\
-        Header set Cache-Control \"max-age=31536000, public\"\n\
-    </FilesMatch>\n\
-</Directory>\n\
-" > /etc/apache2/conf-available/laravel.conf
-RUN a2enconf laravel
+# Set environment variables for Composer
+ENV COMPOSER_MEMORY_LIMIT=-1
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copy application files
+# Copy the application files
 COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/local/bin/composer
 
-# Install Node dependencies and build assets
-RUN npm ci --no-audit --prefer-offline && \
-    npm run build && \
-    npm cache clean --force
+# Install PHP dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev --verbose
 
-# Set permissions (more secure approach)
-RUN chown -R www-data:www-data /var/www/html && \
-    find /var/www/html -type d -exec chmod 755 {} \; && \
-    find /var/www/html -type f -exec chmod 644 {} \; && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Install Node dependencies and build frontend assets
+RUN npm install && npm run build
 
-# Generate application key if not exists
-RUN if [ ! -f .env ]; then \
-        cp .env.example .env && \
-        php artisan key:generate; \
-    fi
+# Set correct permissions for storage and cache directories
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Optimize Laravel for production
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
-
+# Expose port 80
 EXPOSE 80
 
-# Start Apache (don't run migrations automatically in production)
-CMD ["apache2-foreground"]
+# Run migrations first, then start Apache
+CMD php artisan migrate --force && apache2-foreground
