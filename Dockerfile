@@ -10,13 +10,14 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libonig-dev  # Install the required oniguruma package for mbstring
+    libonig-dev \
+    libgd-dev  # Install GD library for PHP
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql zip mbstring bcmath
+RUN docker-php-ext-install pdo_mysql zip mbstring bcmath gd  # Add gd extension
 
 # Set the Laravel public directory as the Apache root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
