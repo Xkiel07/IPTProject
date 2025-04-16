@@ -1,6 +1,10 @@
 #!/bin/bash
-# Replace ${PORT} in the Nginx configuration with the value from the environment variable
+
+# Set default port if not provided
+PORT=${PORT:-8080}
+
+# Replace ${PORT} in nginx.conf
 sed -i "s/\${PORT}/$PORT/g" /etc/nginx/nginx.conf
 
-# Start Nginx
+# Start nginx in foreground
 nginx -g "daemon off;"
