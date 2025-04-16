@@ -29,8 +29,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 ENV COMPOSER_MEMORY_LIMIT=-1
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copy the application files (including composer.json, composer.lock) first
-COPY composer.json composer.lock /var/www/html/
+# Copy the entire application files (including 'artisan' file) before installing dependencies
+COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html
@@ -42,11 +42,8 @@ RUN curl -sS https://getcomposer.org/installer | php && \
 # Clear Composer cache
 RUN composer clear-cache
 
-# Install Laravel dependencies (make sure 'artisan' is available)
+# Install Laravel dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev --verbose
-
-# Copy the rest of the application files after dependencies are installed
-COPY . /var/www/html/
 
 # Set correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
