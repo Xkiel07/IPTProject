@@ -6,18 +6,17 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/sass/app.scss',  // Updated to use SCSS
+                'resources/css/app.css',
                 'resources/js/app.js',
             ],
             refresh: true,
         }),
         tailwindcss(),
     ],
-    resolve: {
-        alias: {
+    resolve:{
+        alias:{
             '@': '/resources',
             '$': 'jquery'
         }
     }
 });
-
