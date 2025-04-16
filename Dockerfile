@@ -12,13 +12,14 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libonig-dev \
     libgd-dev \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/* # Clean up unnecessary apt cache
 
 # Enable Apache mod_rewrite and necessary PHP extensions
 RUN a2enmod rewrite
 
-# Install PHP extensions: pdo_mysql, zip, mbstring, bcmath, and gd
-RUN docker-php-ext-install pdo_mysql zip mbstring bcmath gd
+# Install PHP extensions: pdo_mysql, pdo_pgsql, zip, mbstring, bcmath, and gd
+RUN docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd
 
 # Set the Laravel public directory as the Apache root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
