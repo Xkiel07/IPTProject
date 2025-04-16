@@ -64,12 +64,6 @@ RUN chown -R www-data:www-data /var/www/html && \
     find /var/www/html -type f -exec chmod 644 {} \; && \
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Generate application key if not exists
-RUN if [ ! -f .env ]; then \
-        cp .env.example .env && \
-        php artisan key:generate; \
-    fi
-
 # Optimize Laravel for production
 RUN php artisan config:cache && \
     php artisan route:cache && \
@@ -77,5 +71,5 @@ RUN php artisan config:cache && \
 
 EXPOSE 80
 
-# Start Apache (without automatic migrations)
+# Start Apache
 CMD ["apache2-foreground"]
