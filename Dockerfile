@@ -17,6 +17,20 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Explicit static files configuration
+RUN echo "Alias /javascript /var/www/html/public/javascript" >> /etc/apache2/apache2.conf && \
+    echo "<Directory /var/www/html/public/javascript>" >> /etc/apache2/apache2.conf && \
+    echo "    Options Indexes FollowSymLinks" >> /etc/apache2/apache2.conf && \
+    echo "    AllowOverride None" >> /etc/apache2/apache2.conf && \
+    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
+    echo "</Directory>" >> /etc/apache2/apache2.conf && \
+    echo "Alias /js /var/www/html/public/js" >> /etc/apache2/apache2.conf && \
+    echo "<Directory /var/www/html/public/js>" >> /etc/apache2/apache2.conf && \
+    echo "    Options Indexes FollowSymLinks" >> /etc/apache2/apache2.conf && \
+    echo "    AllowOverride None" >> /etc/apache2/apache2.conf && \
+    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
+    echo "</Directory>" >> /etc/apache2/apache2.conf
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -28,15 +42,18 @@ WORKDIR /var/www/html
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 RUN npm install && npm run build && npm cache clean --force
 
-# Setup storage
+# Setup storage and ensure directories exist
 RUN mkdir -p /var/www/html/storage/framework/{cache,sessions,views} && \
-    mkdir -p /var/www/html/storage/logs
+    mkdir -p /var/www/html/storage/logs && \
+    mkdir -p /var/www/html/public/javascript && \
+    mkdir -p /var/www/html/public/js
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
     find /var/www/html -type d -exec chmod 755 {} \; && \
     find /var/www/html -type f -exec chmod 644 {} \; && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && \
+    chmod -R 755 /var/www/html/public/javascript /var/www/html/public/js
 
 # Laravel optimization
 RUN php artisan storage:link && \
