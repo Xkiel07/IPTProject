@@ -1,10 +1,19 @@
-let admin = document.getElementById("admin");
+document.addEventListener('DOMContentLoaded', function() {
+    const adminPopup = document.getElementById("admin");
+    const adminPopupOverlay = document.getElementById("admin-popup-overlay"); // Example
 
-function openAdminPopup() {
-    closeStaffPopup();
-    admin.classList.add("AdminOpen-popup");
-}
+    window.openAdminPopup = function() {
+        if (adminPopup) {
+            closeStaffPopup(); // Make sure this exists
+            adminPopup.classList.add("AdminOpen-popup");
+            if (adminPopupOverlay) adminPopupOverlay.style.display = 'block';
+        }
+    };
 
-function closeAdminPopup() {
-    admin.classList.remove("AdminOpen-popup");
-}
+    window.closeAdminPopup = function() {
+        if (adminPopup) {
+            adminPopup.classList.remove("AdminOpen-popup");
+            if (adminPopupOverlay) adminPopupOverlay.style.display = 'none';
+        }
+    };
+});
