@@ -144,6 +144,16 @@
 
 </body>
     {{-- Javascript --}}
+    <script>let admin = document.getElementById("admin");
+
+function openAdminPopup() {
+    closeStaffPopup();
+    admin.classList.add("AdminOpen-popup");
+}
+
+function closeAdminPopup() {
+    admin.classList.remove("AdminOpen-popup");
+}</script>
     <script src="{{asset('javascript/Adminpopup.js')}}" ></script>
     <script src="{{ asset('javascript/Staffpopup.js') }}"></script>
 </html>
