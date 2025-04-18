@@ -27,6 +27,7 @@ document.getElementById("QrCodeBtn").onclick = function(){
     });
 }
 
+console.log('JS loaded');
 
 
 
