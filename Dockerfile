@@ -3,21 +3,19 @@ FROM php:8.2-apache
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Install system dependencies and Node.js
 RUN apt-get update && apt-get install -y \
     zip unzip curl git libpng-dev libjpeg-dev libfreetype6-dev \
     libonig-dev libzip-dev libpq-dev libgd-dev lsb-release ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Node.js and npm from NodeSource (latest version)
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    build-essential \
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mods
 RUN a2enmod rewrite headers
 
-# Configure GD library
+# Configure GD library and install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd
 
@@ -41,6 +39,9 @@ COPY . .
 
 # Install PHP dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Check npm versions to ensure it's working
+RUN node -v && npm -v
 
 # Install JS dependencies and build assets
 RUN npm install && npm run build && npm cache clean --force
