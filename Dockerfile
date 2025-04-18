@@ -44,7 +44,7 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     && mkdir -p public/build \
     && mkdir -p public/webfonts
 
-# Set permissions
+# Set permissions: Make sure Apache (www-data) can access all necessary files
 RUN chown -R www-data:www-data /var/www/html && \
     find /var/www/html -type d -exec chmod 755 {} \; && \
     find /var/www/html -type f -exec chmod 644 {} \; && \
@@ -56,5 +56,5 @@ RUN php artisan storage:link && \
     php artisan route:cache && \
     php artisan view:cache
 
-
+# Start Apache in the foreground with optimizations
 CMD bash -c "php artisan optimize && apache2-foreground"
