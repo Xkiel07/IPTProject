@@ -1,6 +1,5 @@
 FROM php:8.2-apache
 
-# Set working directory
 WORKDIR /var/www/html
 
 # Install system dependencies
@@ -34,27 +33,22 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copy source code
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Install PHP & JS dependencies and build assets
+RUN composer install --no-interaction --optimize-autoloader --no-dev && \
+    npm install && npm run build && \
+    npm cache clean --force
 
-# Build frontend assets
-RUN npm install && npm run build && npm cache clean --force
-
-# Create necessary Laravel directories
+# Laravel folders & permissions
 RUN mkdir -p storage/framework/{cache,sessions,views} \
-    storage/logs \
-    public/build \
-    public/webfonts
-
-# Set correct permissions
-RUN chown -R www-data:www-data /var/www/html && \
+    storage/logs && \
+    chown -R www-data:www-data /var/www/html && \
     chmod -R ug+rwx storage bootstrap/cache
 
-# Laravel optimization and symbolic link
+# Laravel post-setup
 RUN php artisan storage:link && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Start Apache server
+# Start Apache with Laravel optimized
 CMD ["bash", "-c", "php artisan optimize && apache2-foreground"]
