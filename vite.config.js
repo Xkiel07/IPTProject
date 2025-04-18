@@ -3,7 +3,7 @@ import laravel from 'laravel-vite-plugin';
 
 export default defineConfig({
     // Base path for serving assets, adjust if necessary
-    base: '/public/',  // Modify based on where assets are served (e.g., '/public/' or another path)
+
 
     plugins: [
         laravel({
