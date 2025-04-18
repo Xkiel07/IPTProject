@@ -56,6 +56,5 @@ RUN php artisan storage:link && \
     php artisan route:cache && \
     php artisan view:cache
 
-EXPOSE 80
 
 CMD bash -c "php artisan optimize && apache2-foreground"
