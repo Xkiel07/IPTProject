@@ -1,21 +1,17 @@
 FROM php:8.2-apache
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies and Node.js
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     zip unzip curl git libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libzip-dev libpq-dev libgd-dev lsb-release ca-certificates \
-    build-essential \
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
+    libonig-dev libzip-dev libpq-dev libgd-dev nodejs npm && \
     rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mods
 RUN a2enmod rewrite headers
 
-# Configure GD library and install PHP extensions
+# Configure GD library
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd
 
@@ -34,19 +30,15 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy source code to container
+# Copy source code
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Install PHP & JS dependencies and build assets
+RUN composer install --no-interaction --optimize-autoloader --no-dev && \
+    npm install && npm run build && \
+    npm cache clean --force
 
-# Check npm versions to ensure it's working
-RUN node -v && npm -v
-
-# Install JS dependencies and build assets
-RUN npm install && npm run build && npm cache clean --force
-
-# Create necessary directories and set permissions
+# Laravel folders & permissions
 RUN mkdir -p storage/framework/{cache,sessions,views} \
     storage/logs && \
     chown -R www-data:www-data /var/www/html && \
