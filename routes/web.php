@@ -92,10 +92,11 @@ Route::middleware(['auth','StaffMiddle:Staff'])->group(function () {
     Route::get('/OTP-Staff-Page',[OTPPageController::class,'ViewStaffOTPPage'])->name('StaffOTP.Page');                                                                                                                                                                                                             
     Route::post('/OTP-Staff-Page-Cofirmation',[OTPConfirmBtnController::class,'StaffOTPConfirmBtn'])->name('StaffOTP.Confirm');
 });
-    Route::get('/Create-Account',[AdminCreateAccountController::class,'ViewAdminCreateAccount'])->name('Admin.Create');
-    Route::post('/Create-Account',[AdminCreateAccountBtnController::class,'CreateAccountBtn'])->name('Admin.Store');
+
 // Admin Only Pages 
-Route::middleware(['auth','AdminOTPMiddle'])->group(function () {                                                                                                                                                                                                        
+Route::middleware(['auth','AdminOTPMiddle'])->group(function () {          
+    Route::get('/Create-Account',[AdminCreateAccountController::class,'ViewAdminCreateAccount'])->name('Admin.Create');
+    Route::post('/Create-Account',[AdminCreateAccountBtnController::class,'CreateAccountBtn'])->name('Admin.Store');                                                                                                                                                                                              
 
     Route::get('/Account-List', [AccountListViewController::class,'ViewAccountList'])->name('Account.List');
     Route::get('/Account-List-Fetch', [AccountListFetchController::class,'FetchAllAccountsData'])->name('Fetch.AccountList');
