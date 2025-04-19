@@ -95,7 +95,7 @@
                 </button>
             </div>
             <div class="contain">
-                <form action="{{route ('RedirectTo.Settings')}}" method="GET" class="SettingsArea">
+                {{-- <form action="{{route ('RedirectTo.Settings')}}" method="GET" class="SettingsArea">
                     @csrf
                     @method('GET')
                     <input type="text" class="" name="SettingsPage"  value="{{Auth::user()->username}}" hidden>
@@ -103,7 +103,7 @@
                         <i class="fa-solid fa-gear"></i>
                         <span class="ButtonName">Setting</span>
                     </button>
-                </form>                 <div class="LogoutArea">
+                </form>  --}}               <div class="LogoutArea">
                     <form action="{{route('Log-Out')}}" method="POST" class="LogoutArea">
                         @csrf
                         @method('POST')
