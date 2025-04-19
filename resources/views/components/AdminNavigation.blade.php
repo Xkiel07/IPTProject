@@ -44,7 +44,7 @@
         <div class="LeftSide" id="NavBarArea">
             <div class="LogoArea">
                 
-            </div>
+            {{-- </div>
                 <div class="ProfilePictureArea1">
                     @if (Auth::user()->profile_picture)
                         <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="" class="img-thumbnail profilepicture1 bg-white">
@@ -54,7 +54,7 @@
                 </div>            
             <div class="NameArea">
                 <p>{{  Auth::user()->FirstName }}</p>
-            </div>
+            </div>--}}
 
             <div class="DashboardArea">
                 <button class="Dashboard" onclick="redirectToAdminDashboard()">
