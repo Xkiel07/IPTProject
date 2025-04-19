@@ -61,7 +61,7 @@ COPY . .
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # Install JS dependencies and build assets
-RUN npm install && npm run build && npm cache clean --force
+RUN npm install && NODE_OPTIONS=--experimental-global-webcrypto npm run build && npm cache clean --force
 
 # Create necessary Laravel directories and set permissions
 RUN mkdir -p storage/framework/{cache,sessions,views} \
