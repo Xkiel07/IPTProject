@@ -1,4 +1,4 @@
-# Use the official PHP 8.2 Apache image
+# Use PHP 8.2 with Apache
 FROM php:8.2-apache
 
 # Set working directory
@@ -6,23 +6,12 @@ WORKDIR /var/www/html
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    zip \
-    unzip \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libzip-dev \
-    libpq-dev \
-    libgd-dev \
-    lsb-release \
-    ca-certificates \
+    zip unzip curl git libpng-dev libjpeg-dev libfreetype6-dev \
+    libonig-dev libzip-dev libpq-dev libgd-dev lsb-release ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js and npm from NodeSource
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+# Install Node.js v18 from NodeSource
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
@@ -31,13 +20,7 @@ RUN a2enmod rewrite headers
 
 # Configure GD library
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install \
-        pdo_mysql \
-        pdo_pgsql \
-        zip \
-        mbstring \
-        bcmath \
-        gd
+    docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd
 
 # Set Apache Document Root to Laravel's public folder
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -61,13 +44,11 @@ COPY . .
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # Install JS dependencies and build assets
-RUN npm install && NODE_OPTIONS=--experimental-global-webcrypto npm run build && npm cache clean --force
+RUN npm install && npm run build && npm cache clean --force
 
-# Create necessary Laravel directories and set permissions
+# Create necessary directories and set permissions
 RUN mkdir -p storage/framework/{cache,sessions,views} \
-    storage/logs \
-    public/build \
-    public/webfonts && \
+    storage/logs && \
     chown -R www-data:www-data /var/www/html && \
     chmod -R ug+rwx storage bootstrap/cache
 
