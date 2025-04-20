@@ -42,7 +42,7 @@
         <div class="LeftSide" id="NavBarArea">
             <div class="LogoArea">
                 
-            {{-- </div>
+            </div>
                 <div class="ProfilePictureArea1">
                     @if (Auth::user()->profile_picture)
                         <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="" class="img-thumbnail profilepicture1 bg-white">
@@ -52,7 +52,7 @@
                 </div>            
             <div class="NameArea">
                 <p>{{  Auth::user()->FirstName }}</p>
-            </div>--}}
+            </div>
 
             <div class="DashboardArea">
                 <button class="Dashboard" onclick="redirectToAdminDashboard()">
@@ -93,7 +93,7 @@
                 </button>
             </div>
             <div class="contain">
-                {{-- <form action="{{route ('RedirectTo.Settings')}}" method="GET" class="SettingsArea">
+                <form action="{{route ('RedirectTo.Settings')}}" method="GET" class="SettingsArea">
                     @csrf
                     @method('GET')
                     <input type="text" class="" name="SettingsPage"  value="{{Auth::user()->username}}" hidden>
@@ -101,7 +101,7 @@
                         <i class="fa-solid fa-gear"></i>
                         <span class="ButtonName">Setting</span>
                     </button>
-                </form>  --}}               <div class="LogoutArea">
+                </form>                 <div class="LogoutArea">
                     <form action="{{route('Log-Out')}}" method="POST" class="LogoutArea">
                         @csrf
                         @method('POST')
