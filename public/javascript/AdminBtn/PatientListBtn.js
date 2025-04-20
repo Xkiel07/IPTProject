@@ -1,3 +1,3 @@
 function redirectToPatientList() {
-    window.location.href = "http://localhost:8000/Patient-List-View";
+    window.location.href = "https://iptproject-idxs.onrender.com/Patient-List-View";
 }   
