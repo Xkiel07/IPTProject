@@ -1,3 +1,3 @@
 function redirectToAddProgram() {
-    window.location.href = "http://localhost:8000/Add-New-Program";
+    window.location.href = "https://iptproject-idxs.onrender.com/Add-New-Program";
 }
