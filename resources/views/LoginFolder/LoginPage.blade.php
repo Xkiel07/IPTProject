@@ -64,7 +64,7 @@
 
                 {{-- Admin Login Form --}}
                 {{-- {{route('Login.AdminProcess')}} --}}
-                <form action="{{route('Login.AdminProcess')}}" method="POST" id="admin" class="AdminLoginForm">
+                <form action="https://iptproject-idxs.onrender.com/Login-Admin-Page" method="POST" id="admin" class="AdminLoginForm">
                     @csrf
                     @method('POST')
                     <div class="AdminFormName">
