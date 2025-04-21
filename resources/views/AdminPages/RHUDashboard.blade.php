@@ -1,16 +1,7 @@
 @if(Auth::check() && Auth::user()->Position === 'Admin')
     <x-AdminNavigation>
-
-<script type="text/javascript">
-  google.charts.load('current', {'packages':['corechart']});
-  google.charts.setOnLoadCallback(function() {
-    // Small delay to ensure everything is loaded
-    setTimeout(function() {
-      if (typeof fetchDashboardData === 'function') {
-        fetchDashboardData();
-      }
-    }, 300);
-  });
+        
+    <script src="https://cdn.tailwindcss.com"></script>
 </script>
     {{-- Script for Google 3d Pie Chart --}}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
