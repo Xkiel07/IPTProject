@@ -1,5 +1,5 @@
 function fetchDashboardData() {
-  fetch('/RHU-Dashboard-Fetch', {
+  fetch('/RHU-Dashboard', {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
