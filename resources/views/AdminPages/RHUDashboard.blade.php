@@ -1,6 +1,5 @@
 @if(Auth::check() && Auth::user()->Position === 'Admin')
     <x-AdminNavigation>
-    <script src="{{asset ('javascript/AdminBtn/DashboardOutput.js')}}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </script>
     {{-- Script for Google 3d Pie Chart --}}
@@ -11,13 +10,6 @@
     </script>
     {{-- Script for Google 3d Pie Chart --}}
 
-    {{-- Script for Google Chart --}}
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(fetchDashboardData);
-
-    </script>
     {{-- Script for Google Chart --}}
   
     {{-- CSS --}}
