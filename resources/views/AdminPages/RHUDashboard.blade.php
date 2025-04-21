@@ -7,7 +7,7 @@
         google.charts.setOnLoadCallback(fetchDashboardData);
     </script>
     {{-- Script for Google 3d Pie Chart --}}
-
+    <script src="https://cdn.tailwindcss.com"></script>
     {{-- Script for Google Chart --}}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
