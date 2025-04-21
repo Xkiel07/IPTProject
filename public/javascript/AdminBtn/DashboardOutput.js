@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
              
     // Initial fetch
-    fetchDashboardData();
+    // fetchDashboardData();
 
-    setInterval(fetchDashboardData, 1000);
+    // setInterval(fetchDashboardData, 1000);
 });
