@@ -18,10 +18,10 @@
     {{-- Script for Google Chart --}}
   
     {{-- CSS --}}
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/Dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/FirstArea.css') }}">
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/SecondArea.css') }}">
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/ThirdArea.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/Dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/FirstArea.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/SecondArea.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/ThirdArea.css') }}">
 
     <x-slot name="Title">
         Dashboard
@@ -77,7 +77,7 @@
     
     {{-- Script --}}
     <script src="{{asset('/javascript/Date.js')}}" ></script>
-    <script src="{{asset ('/javascript/AdminBtn/DashboardOutput.js')}}"></script>
+    <script src="{{asset ('javascript/AdminBtn/DashboardOutput.js')}}"></script>
 </x-AdminNavigation>
 
 @else
@@ -100,10 +100,10 @@
     {{-- Script for Google Chart --}}
   
     {{-- CSS --}}
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/Dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/FirstArea.css') }}">
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/SecondArea.css') }}">
-    <link rel="stylesheet" href="{{ asset('/AdminAccountCss/ThirdArea.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/Dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/FirstArea.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/SecondArea.css') }}">
+    <link rel="stylesheet" href="{{ asset('AdminAccountCss/ThirdArea.css') }}">
 
     <x-slot name="Title">
         Dashboard
@@ -159,7 +159,7 @@
     
     {{-- Script --}}
     <script src="{{asset('/javascript/Date.js')}}" ></script>
-    <script src="{{asset ('/javascript/AdminBtn/DashboardOutput.js')}}"></script>
+    <script src="{{asset ('javascript/AdminBtn/DashboardOutput.js')}}"></script>
     </x-StaffNavigation>
 @endif
 
