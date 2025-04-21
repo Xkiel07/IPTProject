@@ -1,6 +1,6 @@
 @if(Auth::check() && Auth::user()->Position === 'Admin')
     <x-AdminNavigation>
-        
+    <script src="{{asset ('javascript/AdminBtn/DashboardOutput.js')}}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </script>
     {{-- Script for Google 3d Pie Chart --}}
@@ -80,7 +80,6 @@
     
     {{-- Script --}}
     <script src="{{asset('/javascript/Date.js')}}" ></script>
-    <script src="{{asset ('javascript/AdminBtn/DashboardOutput.js')}}"></script>
 </x-AdminNavigation>
 
 @else
