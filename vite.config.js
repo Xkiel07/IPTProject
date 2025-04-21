@@ -1,30 +1,19 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from 'tailwindcss';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: [
-                'resources/css/app.css',
-                'resources/js/app.js',
-            ],
+            input: ['resources/css/app.css'],
             refresh: true,
         }),
     ],
-    optimizeDeps: {
-        include: [
-            '@fortawesome/fontawesome-free',
-            'bootstrap'
-        ]
+    css: {
+        postcss: {
+            plugins: [
+                tailwindcss(),
+            ],
+        },
     },
-    build: {
-        manifest: true,
-        outDir: 'public/build', // <== IMPORTANT
-        rollupOptions: {
-            output: {
-                assetFileNames: 'assets/[name]-[hash][extname]',
-                entryFileNames: 'assets/[name]-[hash].js',
-            }
-        }
-    }
 });
