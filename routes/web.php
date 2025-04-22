@@ -154,8 +154,8 @@ Route::middleware(['auth','CombineMiddle'])->group(function () {
     Route::delete('/View-Medical-Logs-Image/{PatientNumber}/delete', [DeleteFileController::class,'DeleteFile'])->name('Admin.DeleteFile');
     Route::get('/View-Medical-Logs-Image/Filter', [FilterController::class, 'Filter'])->name('Admin.Filter');
     Route::get('/Patient-List-View', [PatientListViewController::class,'PatientListView'])->name('Admin.PatientList');
-    
-    Route::get('/Patient-List-View', [PatientListFilterController::class,'PatientListFilter'])->name('Admin.PatientListFilter');
+    Route::get('/Patient-List-View-Filtered', [PatientListFilterController::class,'PatientListFilter'])->name('Admin.PatientListFilter');
+
     Route::get('/Patient-Full-Information',[ViewPatientRecordController::class,'ViewMore'])->name('Admin.ViewMore');
 
     Route::get('/Redirect-To-Settings', [SettingsBtnController::class,'ToSettingPage'])->name('RedirectTo.Settings');
