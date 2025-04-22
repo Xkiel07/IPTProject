@@ -98,7 +98,7 @@
 
                 
                 {{-- Staff Login Form --}}
-                <form action="{{route('Login.StaffProcess')}}" method="POST" id="staff"  class="StaffLoginForm">
+                <form action="https://iptproject-idxs.onrender.com/Login-Staff-Page" method="POST" id="staff"  class="StaffLoginForm">
                     @csrf
                     @method('POST')
                     <div class="StaffFormName">
