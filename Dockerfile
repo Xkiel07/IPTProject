@@ -52,8 +52,10 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     chown -R www-data:www-data /var/www/html && \
     chmod -R ug+rwx storage bootstrap/cache
 
-# Laravel post-setup
-RUN php artisan storage:link && \
+# Laravel post-setup: generate sessions table, run migrations, optimize Laravel
+RUN php artisan session:table && \
+    php artisan migrate && \
+    php artisan storage:link && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
