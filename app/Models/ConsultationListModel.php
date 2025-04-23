@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ConsultationListModel extends Model
 {
     use HasFactory;
-    protected $table = 'consultationlist';
+    protected $table = 'ConsultationList';
 
     protected $fillable = [
         'ConsultationList',
