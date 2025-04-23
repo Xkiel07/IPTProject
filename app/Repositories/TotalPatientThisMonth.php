@@ -9,12 +9,11 @@ class TotalPatientThisMonth
     public function CurrentMonthTotalPatient()
     {
         $TotalNumberOfPatients = DB::table('patientmedicallog')
-            ->select(DB::raw('count(distinct PatientNumber) as NumPatient'))
+            ->select(DB::raw('count(distinct "patientmedicallog"."PatientNumber") as "NumPatient"'))
             ->whereYear('DateOfConsultation', date('Y'))
             ->whereMonth('DateOfConsultation', date('m'))
             ->first();
-            
+
         return $TotalNumberOfPatients->NumPatient;
     }
 }
-// in user
