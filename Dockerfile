@@ -53,8 +53,7 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     chmod -R ug+rwx storage bootstrap/cache
 
 # Laravel post-setup: generate sessions table, run migrations, optimize Laravel
-RUN if [ ! -f database/migrations/*_create_sessions_table.php ]; then php artisan session:table; fi && \
-    php artisan migrate --force && \
+RUN php artisan migrate --force && \
     php artisan storage:link && \
     php artisan config:cache && \
     php artisan route:cache && \
