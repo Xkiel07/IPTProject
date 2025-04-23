@@ -5,40 +5,40 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\AccountsModel;
 
+
 class AccountListFetchController extends Controller
 {
-    public function FetchAllAccountsData()
-    {
-        // Get all active staff accounts
+    public function FetchAllAccountsData(){
+        // for getting all active accounts
         $AllActiveAccounts = AccountsModel::where('Position', 'Staff')
-            ->where('Status', 'Active')
-            ->orderBy('id')
-            ->get();
+        ->where('Status', 'Active')
+        ->orderBy('id')
+        ->get();
 
-        // Check activity and update status if inactive for more than 30 minutes
+        // for checking if the account it inactive for 30 mins
         foreach ($AllActiveAccounts as $AccountsStats) {
-            $lastActivity = Carbon::parse($AccountsStats->LastActivity);
+        $lastActivity = Carbon::parse($AccountsStats->LastActivity);
 
-            if ($lastActivity->diffInMinutes(Carbon::now()) > 30) {
-                $AccountsStats->ActivityStatus = 'Offline';
-                $AccountsStats->save();
-            }
+        // for changing the status of account if inactive
+        if ($lastActivity->diffInMinutes(Carbon::now()) > 30) {
+        $AccountsStats->ActivityStatus = 'Offline';
+        $AccountsStats->save();
+        } 
+
         }
 
-        // Get all deactivated staff accounts
+        // for getting all deactivated accounts
         $AllDeactivedAccounts = AccountsModel::where('Position', 'Staff')
             ->where('Status', 'Deactivated')
             ->get();
 
-        // Return a message if no accounts found
-        if ($AllActiveAccounts->isEmpty() && $AllDeactivedAccounts->isEmpty()) {
-            return response()->json(['message' => 'No Accounts Found']);
+        // for displaying if there is no active or deactivated accounts 
+        if ($AllActiveAccounts->isEmpty() && $AllDeactivedAccounts->isEmpty()) { 
+        return view('AdminPages.AccountList', compact('AllActiveAccounts', 'AllDeactivedAccounts'))
+            ->with(['NoAccount' => 'No Accounts']); 
         }
 
-        // Return both active and deactivated accounts
-        return response()->json([
-            'ActiveAccounts' => $AllActiveAccounts,
-            'DeactivatedAccounts' => $AllDeactivedAccounts
-        ]);
+        return response()->json(['ActiveAccounts' => $AllActiveAccounts,
+                                'DeactivatedAccounts' => $AllDeactivedAccounts]);
     }
 }
