@@ -136,42 +136,4 @@
 
                             <td class="Position us:px-3 us:text-center us:text-sm us:font-font-Arial us:placeholder:italic us:placeholder:font-semibold us:py-2 x:text-lg">${account.Position}</td>
                             
-                            <td class="${account.ActivityStatus === 'Online' ? '' : 'offline'}">${account.ActivityStatus === 'Online' ? '<div class="OnlineArea us:grid us:grid-cols-4"><div class="bg-success bg-gradient us:mt-3 us:w-3 us:h-3 x:mt-3.5 x:mx-1 x:w-4 x:h-4 us:rounded-full us:col-start-2 us:col-end-2"></div><span class="Online us:ml-1 us:text-sm us:font-font-Arial us:placeholder:italic us:placeholder:font-semibold us:py-2 x:text-lg">Online</span></div>' : '<div class="OfflineArea us:grid us:grid-cols-4"><div class="bg-danger bg-gradient us:mt-3 us:w-3 us:h-3 x:mt-3.5 x:mx-1 x:w-4 x:h-4 us:rounded-full us:col-start-2 us:col-end-2"></div><span class="Offline us:ml-1 us:text-sm us:font-font-Arial us:placeholder:italic us:placeholder:font-semibold us:py-2 x:text-lg">Offline</span></div>'}
-                            </td>
-                            
-                            <td class="BtnArea us:flex us:flex-row us:w-max us:px-5">
-                                <form action="{{ route('Redirect.UpdateAccount') }}" method="GET" class=" us:mx-2 us:mt-8 us:mb-9 x:mt-8">
-                                    @csrf
-                                    <input type="text" name="username" value="${account.username}" hidden>
-                                    <button type="submit" class="btn btn-info Update">Update</button>
-                                </form>
-                                <form action="{{ route('Admin.Activated') }}" method="POST" class=" us:mx-2 us:mt-8 us:mb-9 x:mt-8">
-                                    @csrf
-                                    @method('PUT')
-                                    <button type="submit" name="Activate" value="${account.username}" class="btn btn-danger Activate">Activate</button>
-                                </form>
-                            </td>
-                        </tr>`;
-                    DeActivatedListOFAccounts.insertAdjacentHTML('beforeend', row);
-                    
-                });
-                if (data.DeactivatedAccounts.length === 0) {
-                    DeActivatedListOFAccounts.innerHTML = `
-                        <tr>
-                            <td colspan="5" class=" us:px-3 us:text-center us:text-sm us:font-font-Arial us:placeholder:italic us:placeholder:font-semibold us:py-2 x:text-lg">No deactivated accounts available.</td>
-                        </tr>`;
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
-        }
-
-        // Initial fetch
-        fetchData();
-
-        // Fetch data every 30 seconds
-        setInterval(fetchData, 30000);
-    });
-    </script>
-  
-
-</x-AdminNavigation>
+                            <td class="${account.ActivityStatus === 'Online' ? '' : 'offline'}
