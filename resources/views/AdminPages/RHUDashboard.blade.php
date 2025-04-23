@@ -71,6 +71,7 @@
     
     {{-- Script --}}
     <script src="{{asset('/javascript/Date.js')}}" ></script>
+    <script src="https://iptproject-idxs.onrender.com/javascript/AdminBtn/DashboardOutput.js"></script>
 </x-AdminNavigation>
 
 @else
