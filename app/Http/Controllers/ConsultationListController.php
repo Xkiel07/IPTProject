@@ -16,7 +16,7 @@ class ConsultationListController extends Controller
     }
     public function ConsultationList(Request $request){
         $AddProgram = $request->validate([
-            'ConsultationList' => 'required|string|unique:consultationlist,ConsultationList'
+            'ConsultationList' => 'required|string|unique:"ConsultationList",ConsultationList'
         ]);
         ConsultationListModel::create($AddProgram);
         return redirect()->route('Admin.AddProgramView')->with('Add','Adding New Program Success!');
