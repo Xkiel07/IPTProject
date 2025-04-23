@@ -8,7 +8,12 @@
         google.charts.setOnLoadCallback(fetchDashboardData);
     </script>
     {{-- Script for Google 3d Pie Chart --}}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(fetchDashboardData);
 
+    </script>
     {{-- Script for Google Chart --}}
   
     {{-- CSS --}}
