@@ -1,4 +1,3 @@
-
 @if(Auth::check() && Auth::user()->Position === 'Admin')
     <x-AdminNavigation>
     {{-- Script for Google 3d Pie Chart --}}
@@ -163,3 +162,5 @@
     <script src="{{asset ('javascript/AdminBtn/DashboardOutput.js')}}"></script>
     </x-StaffNavigation>
 @endif
+
+    
