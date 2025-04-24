@@ -1,4 +1,4 @@
-You said:
+
 @if(Auth::check() && Auth::user()->Position === 'Admin')
     <x-AdminNavigation>
     {{-- Script for Google 3d Pie Chart --}}
