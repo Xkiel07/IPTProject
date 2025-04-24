@@ -335,5 +335,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial fetch
     fetchDashboardData();
 
-    setInterval(fetchDashboardData, 1000);
 });
