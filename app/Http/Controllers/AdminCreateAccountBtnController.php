@@ -43,7 +43,7 @@ class AdminCreateAccountBtnController extends Controller
         }
         
         $AccountDetails['Status'] = 'Active';
-        $AccountDetails['Position'] = 'Admin';
+        $AccountDetails['Position'] = 'Staff';
         $AccountDetails['ActivityStatus'] = 'Offline';
         AccountsModel::create($AccountDetails);
 
