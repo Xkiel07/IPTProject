@@ -1,338 +1,219 @@
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    // Function to fetch and display the dashboard data
     function fetchDashboardData() {
         fetch('https://iptproject-idxs.onrender.com/RHU-Dashboard-Fetch', {
-            method: 'GET',  // Make sure the request method is GET
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',  // Ensure the content type is JSON
-                'X-CSRF-TOKEN': csrfToken  // Add CSRF token to the request headers
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
             }
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Unable to fetch data from the database' + response.statusText);
+                throw new Error('Unable to fetch data from the database: ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-           
-            // Total number of Patient for the current month
+            console.log('Fetched data:', data); // Log the data for inspection
+
+            // Check if data is empty or malformed
+            if (!data) {
+                console.error('No data received');
+                return;
+            }
+
+            // Total number of Patients for the current month
             const Total = document.getElementById('Total');
-            const TotalCount = data.TotalForThisMonth;
-            Total.innerText = TotalCount;
+            if (Total) {
+                const TotalCount = data.TotalForThisMonth || 'N/A';
+                Total.innerText = TotalCount;
+            }
 
-            // Display Highest Consultation and its Number of Patients
+            // Highest Consultation and its Number of Patients
             const HighestConsultationArea = document.getElementById('HighestConsultationArea');
-            HighestConsultationArea.innerHTML = '';
+            if (HighestConsultationArea) {
+                HighestConsultationArea.innerHTML = '';
 
-            if (data.HighestConsul && data.HighestConsul.length > 0 && data.HighestConsul[0].Consultation && data.HighestConsultationValue && data.HighestConsultationValue !== 0) {
-                HighestConsultationArea.insertAdjacentHTML('beforeend', `
-                  
-                        <span class="HighestConsultation us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-lg md:text-lg">Current Highest</span>
-                    
-    
-                    
-                        <span class="HighestConsultation  us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            ${data.HighestConsul[0].Consultation}
-                        </span>
-                        <span class="HighestConsultationPercentage  us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            Patients: ${data.HighestConsultationValue}        
-                        </span>
-                 
-                `);
-            } else {
-                HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                const highestConsultation = data.HighestConsul && data.HighestConsul[0];
+                const highestConsultationValue = data.HighestConsultationValue || 0;
 
-                        <span class="HighestConsultation us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-lg md:text-lg">Current Highest</span>
-                 
-    
+                if (highestConsultation && highestConsultation.Consultation && highestConsultationValue > 0) {
+                    HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                        <span class="HighestConsultation">Current Highest</span>
+                        <span class="HighestConsultation">${highestConsultation.Consultation}</span>
+                        <span class="HighestConsultationPercentage">Patients: ${highestConsultationValue}</span>
+                    `);
+                } else {
+                    HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                        <span class="HighestConsultation">Current Highest</span>
+                        <span class="HighestConsultation">No Data</span>
+                        <span class="HighestConsultationPercentage">Patients: 0</span>
+                    `);
+                }
 
-                        <span class="HighestConsultation us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            No Data
-                        </span>
-                        <span class="HighestConsultationPercentage us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            Patients: 0  
-                        </span>
-
-                `);
+                // Compare current highest to past record
+                const prevHighest = data.PrevDataOfCurrentHighestData || 0;
+                if (prevHighest === 0) {
+                    HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                        <span>No Data</span>
+                    `);
+                } else {
+                    const diff = data.HighConsulDiff || 0;
+                    if (prevHighest < highestConsultationValue) {
+                        HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                            <span>There is an increase in case: ${Math.abs(diff).toFixed(0)}%</span>
+                        `);
+                    } else if (prevHighest > highestConsultationValue) {
+                        HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                            <span>There is a decrease in case: ${Math.abs(diff).toFixed(0)}%</span>
+                        `);
+                    } else {
+                        HighestConsultationArea.insertAdjacentHTML('beforeend', `
+                            <span>There is no change in cases.</span>
+                        `);
+                    }
+                }
             }
 
-            // Compare Current Highest To Past Record
-            // console.log(data.HighestConsultationValue);  
-            if (data.PrevDataOfCurrentHighestData === 0) {
-                HighestConsultationArea.insertAdjacentHTML('beforeend', `
-                    <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                      No Data
-                    </span>    
-               
-                `);
-            }
-            else if (data.PrevDataOfCurrentHighestData < data.HighestConsultationValue) {
-            HighestConsultationArea.insertAdjacentHTML('beforeend', `
-           
-                <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                   There is an increase in case
-                   ${Number(Math.abs(data.HighConsulDiff)).toFixed(0)}%
-                </span>    
-         
-             `);
-            } 
-            else if (data.PrevDataOfCurrentHighestData > data.HighestConsultationValue) {
-            HighestConsultationArea.insertAdjacentHTML('beforeend', `
-            
-                <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    There is decrease in case
-                     ${Number(Math.abs(data.HighConsulDiff)).toFixed(0)}%
-                </span>    
-          
-            `);
-            } 
-            else if (data.PrevDataOfCurrentHighestData === data.HighestConsultationValue) {
-            HighestConsultationArea.insertAdjacentHTML('beforeend', `
-            
-                 <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                   There is no increase or decrease in cases.
-                 </span>    
-            
-            `);
-            }
-            else if (data.HighestConsultationValue === 0) {
-            HighestConsultationArea.insertAdjacentHTML('beforeend', `
-            
-                <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    No Data
-                </span>    
-           
-            `);
-            }
-        
-            // Display Lowest Consultation and its Number of Patients
+            // Lowest Consultation and its Number of Patients
             const LowestConsultationArea = document.getElementById('LowestConsultationArea');
-            LowestConsultationArea.innerHTML = '';
-            // console.log(data.LowestConsultationValue);
-            if (data.LowestConsul && data.LowestConsul.length > 0 && data.LowestConsul[0].Consultation && data.LowestConsultationValue && data.LowestConsultationValue !== 0) {
-                LowestConsultationArea.insertAdjacentHTML('beforeend', `
-                    
-                        <span class="LowestConsultation us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-lg md:text-lg">Current Lowest</span>
-                   
-    
-                    
-                        <span class="LowestConsultation us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            ${data.LowestConsul[0].Consultation}
-                        </span>
-                        <span class="LowestConsultationPercentage us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            Patients: ${data.LowestConsultationValue}        
-                        </span>
-                    
-                `);
-            } else {
-                LowestConsultationArea.insertAdjacentHTML('beforeend', `
-                   
-                        <span class="LowestConsultation us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-lg md:text-lg">Current Lowest</span>
-                   
+            if (LowestConsultationArea) {
+                LowestConsultationArea.innerHTML = '';
 
-                  
-                        <span class="LowestConsultation us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            No Data
-                        </span>
-                        <span class="LowestConsultationPercentage us:text-md us:font-semibold font-font-Arial us:mx-2 x:text-2xl md:text-2xl">
-                            Patients: 0
-                        </span>
-                 
-                `);
-            }
-            // Compare Current Lowest To Past Record
-            // console.log(data.PrevDataOfCurrentLowestData);  
-            if (data.PrevDataOfCurrentLowestData === 0) {
-                LowestConsultationArea.insertAdjacentHTML('beforeend', `
-              
-                    <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                      No Data
-                    </span>    
+                const lowestConsultation = data.LowestConsul && data.LowestConsul[0];
+                const lowestConsultationValue = data.LowestConsultationValue || 0;
 
-                `);
-            }
-            else if (data.PrevDataOfCurrentLowestData < data.LowestConsultationValue) {
-                LowestConsultationArea.insertAdjacentHTML('beforeend', `
-        
-                <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                   There is an increase in case
-                   ${Number(Math.abs(data.LowConsulDiff)).toFixed(0)}%
-                </span>    
+                if (lowestConsultation && lowestConsultation.Consultation && lowestConsultationValue > 0) {
+                    LowestConsultationArea.insertAdjacentHTML('beforeend', `
+                        <span class="LowestConsultation">Current Lowest</span>
+                        <span class="LowestConsultation">${lowestConsultation.Consultation}</span>
+                        <span class="LowestConsultationPercentage">Patients: ${lowestConsultationValue}</span>
+                    `);
+                } else {
+                    LowestConsultationArea.insertAdjacentHTML('beforeend', `
+                        <span class="LowestConsultation">Current Lowest</span>
+                        <span class="LowestConsultation">No Data</span>
+                        <span class="LowestConsultationPercentage">Patients: 0</span>
+                    `);
+                }
 
-             `);
-            } 
-            else if (data.PrevDataOfCurrentLowestData > data.LowestConsultationValue) {
-            LowestConsultationArea.insertAdjacentHTML('beforeend', `
-             
-                <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    There is decrease in case
-                     ${Number(Math.abs(data.LowConsulDiff)).toFixed(0)}%
-                </span>    
-          
-            `);
-            } 
-            else if (data.PrevDataOfCurrentLowestData === data.LowestConsultationValue) {
-            LowestConsultationArea.insertAdjacentHTML('beforeend', `
-           
-                 <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                   There is no increase or decrease in cases.
-                 </span>    
-            
-            `);
-            }
-            else if (data.LowestConsultationValue === 0) {
-            LowestConsultationArea.insertAdjacentHTML('beforeend', `
-
-                <span class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    No Data
-                </span>    
-            `);
+                // Compare current lowest to past record
+                const prevLowest = data.PrevDataOfCurrentLowestData || 0;
+                if (prevLowest === 0) {
+                    LowestConsultationArea.insertAdjacentHTML('beforeend', `
+                        <span>No Data</span>
+                    `);
+                } else {
+                    const diff = data.LowConsulDiff || 0;
+                    if (prevLowest < lowestConsultationValue) {
+                        LowestConsultationArea.insertAdjacentHTML('beforeend', `
+                            <span>There is an increase in case: ${Math.abs(diff).toFixed(0)}%</span>
+                        `);
+                    } else if (prevLowest > lowestConsultationValue) {
+                        LowestConsultationArea.insertAdjacentHTML('beforeend', `
+                            <span>There is a decrease in case: ${Math.abs(diff).toFixed(0)}%</span>
+                        `);
+                    } else {
+                        LowestConsultationArea.insertAdjacentHTML('beforeend', `
+                            <span>There is no change in cases.</span>
+                        `);
+                    }
+                }
             }
 
-        // Table Area Label
-        const BreakDownLabel = document.getElementById('BreakDownLabel');
-        BreakDownLabel.innerHTML = '';
-            var row = `
-              <tr class="">
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Consultation</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Total Number of Patient</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Male</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Senior Male</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Adult Male</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Teen Male</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Child Male</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Female</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Senior Female</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Adult Female</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Teen Female</th>
-                <th class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">Child Female</th>
-            </tr>
-            `;
-        BreakDownLabel.innerHTML = row;
-        // Table Area Value
-        // console.log(data)
-        const BreakDown = document.getElementById('BreakDown');
-        BreakDown.innerHTML = '';
-            data.Data.forEach(function(List){
-                var row = `
-                <tr>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2  x:text-sm md:text-sm"
-                    <div class="">
-                        ${List.Consultation}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class="">
-                        ${List.NumPatient}
-                    </div>
-                </td> 
-
-
-
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class="">
-                        ${List.NumMale}
-                    </div>
-                </td>   
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumSeniorMale}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumAdultMale}
-                    </div>
-                </td>                
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumTeenMale}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumChildMale}
-                    </div>
-                </td>
-
-                
-
-
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumFemale}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumSeniorFemale}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumAdultFemale}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumTeenFemale}
-                    </div>
-                </td>
-                <td class=" us:text-tiny us:font-semibold font-font-Arial us:m-2 x:text-sm md:text-sm">
-                    <div class=" ">
-                        ${List.NumChildFemale}
-                    </div>
-                </td>
+            // Table Area: Consultation Breakdown
+            const BreakDownLabel = document.getElementById('BreakDownLabel');
+            if (BreakDownLabel) {
+                const row = `
+                    <tr>
+                        <th>Consultation</th>
+                        <th>Total Number of Patient</th>
+                        <th>Male</th>
+                        <th>Senior Male</th>
+                        <th>Adult Male</th>
+                        <th>Teen Male</th>
+                        <th>Child Male</th>
+                        <th>Female</th>
+                        <th>Senior Female</th>
+                        <th>Adult Female</th>
+                        <th>Teen Female</th>
+                        <th>Child Female</th>
+                    </tr>
                 `;
-                BreakDown.innerHTML += row;
-            
-        
-            // Google Chart  
-            console.log(data.CurrentYearData);
-            const ChartColumn = [['Month', 'NumPatient']];
-            data.CurrentYearData.forEach(Value => {
-                ChartColumn.push([Value.Month, Value.NumPatient]);
-            });
-            const ChartColumnData = google.visualization.arrayToDataTable(ChartColumn);
-            var options = {
-                title : 'Number of patients for each month.',
-                vAxis: {title: 'Patients'},
-                hAxis: {title: 'Month'},
-                seriesType: 'bars',
-                series: {5: {type: 'line'}},
-                chartArea: { left: '6%', top: '30%', width: '100%', height: '50%' }
-              };
-      
-              var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
-              chart.draw(ChartColumnData, options);
-            });
-            // Pie Chart                      
-            const pieChartDataArray = [['Consultation', 'NumPatient']];
-            data.Pie.forEach(Value => {
-                pieChartDataArray.push([Value.Consultation, Value.NumPatient]);
-            });
-            const pieChartData = google.visualization.arrayToDataTable(pieChartDataArray);
+                BreakDownLabel.innerHTML = row;
+            }
 
-            const options = {
-                is3D: true,
-                backgroundColor: { fill: 'transparent' },
-                legend: 'none',
-                pieStartAngle: 90,
-                chartArea: { left: '5%', top: '0', width: '85%', height: '75%' },
-                titleTextStyle: { color: 'black', fontName: 'Arial', fontSize: 18, italic: true, bold: true },
+            const BreakDown = document.getElementById('BreakDown');
+            if (BreakDown) {
+                BreakDown.innerHTML = '';
+                data.Data.forEach(function(List) {
+                    const row = `
+                    <tr>
+                        <td>${List.Consultation}</td>
+                        <td>${List.NumPatient}</td>
+                        <td>${List.NumMale}</td>
+                        <td>${List.NumSeniorMale}</td>
+                        <td>${List.NumAdultMale}</td>
+                        <td>${List.NumTeenMale}</td>
+                        <td>${List.NumChildMale}</td>
+                        <td>${List.NumFemale}</td>
+                        <td>${List.NumSeniorFemale}</td>
+                        <td>${List.NumAdultFemale}</td>
+                        <td>${List.NumTeenFemale}</td>
+                        <td>${List.NumChildFemale}</td>
+                    </tr>
+                    `;
+                    BreakDown.innerHTML += row;
+                });
+            }
 
-            };
+            // Google Charts: Column Chart (Yearly)
+            if (data.CurrentYearData) {
+                const ChartColumn = [['Month', 'NumPatient']];
+                data.CurrentYearData.forEach(Value => {
+                    ChartColumn.push([Value.Month, Value.NumPatient]);
+                });
+                const ChartColumnData = google.visualization.arrayToDataTable(ChartColumn);
+                const options = {
+                    title: 'Number of patients for each month.',
+                    vAxis: { title: 'Patients' },
+                    hAxis: { title: 'Month' },
+                    seriesType: 'bars',
+                    series: { 5: { type: 'line' } },
+                    chartArea: { left: '6%', top: '30%', width: '100%', height: '50%' }
+                };
+                const chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+                chart.draw(ChartColumnData, options);
+            }
 
-            const chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
-            chart.draw(pieChartData, options);
-     
-    })
-        .catch(error => console.error(error));
+            // Google Charts: Pie Chart
+            if (data.Pie) {
+                const pieChartDataArray = [['Consultation', 'NumPatient']];
+                data.Pie.forEach(Value => {
+                    pieChartDataArray.push([Value.Consultation, Value.NumPatient]);
+                });
+                const pieChartData = google.visualization.arrayToDataTable(pieChartDataArray);
+                const options = {
+                    is3D: true,
+                    backgroundColor: { fill: 'transparent' },
+                    legend: 'none',
+                    pieStartAngle: 90,
+                    chartArea: { left: '5%', top: '0', width: '85%', height: '75%' },
+                    titleTextStyle: { color: 'black', fontName: 'Arial', fontSize: 18, italic: true, bold: true }
+                };
+                const chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+                chart.draw(pieChartData, options);
+            }
+
+        })
+        .catch(error => {
+            console.error('Error fetching dashboard data:', error);
+        });
     }
-             
+
     // Initial fetch
     fetchDashboardData();
-
 });
