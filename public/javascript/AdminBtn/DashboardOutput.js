@@ -3,10 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchDashboardData() {
         fetch('/RHU-Dashboard-Fetch', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
+
             }
         })
         .then(response => {
