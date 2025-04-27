@@ -117,7 +117,7 @@ Route::middleware(['auth','AdminOTPMiddle'])->group(function () {
 
 Route::middleware(['auth','CombineMiddle'])->group(function () {  
     Route::get('/RHU-Dashboard', [DashboardController::class, 'ShowDashboard'])->name('Admin.Dashboard');
-    Route::get('/RHU-Dashboard-Fetch', [DashboardFetchDataController::class,'DashboardFetchData'])->name('Dashboard.fetchData');
+    Route::get('https://iptproject-idxs.onrender.com/RHU-Dashboard-Fetch', [DashboardFetchDataController::class,'DashboardFetchData'])->name('Dashboard.fetchData');
     Route::get('/New-Patient',[AdminNewPatient::class,'ViewAdminNewPatient'])->name('Admin.New');
     Route::post('/New-Patient',[AdminSaveBtnController::class,'AdminSaveBtn'])->name('Admin.Save');
     
