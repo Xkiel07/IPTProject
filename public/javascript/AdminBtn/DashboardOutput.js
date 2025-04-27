@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     function fetchDashboardData() {
-        fetch('/RHU-Dashboard-Fetch', {
+        fetch('https://iptproject-idxs.onrender.com/RHU-Dashboard-Fetch', {
 
             }
         })
