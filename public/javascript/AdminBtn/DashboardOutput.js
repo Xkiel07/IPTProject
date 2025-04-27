@@ -3,7 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchDashboardData() {
         fetch('https://iptproject-idxs.onrender.com/RHU-Dashboard-Fetch', {
-
+            method: 'GET',  // Make sure the request method is GET
+            headers: {
+                'Content-Type': 'application/json',  // Ensure the content type is JSON
+                'X-CSRF-TOKEN': csrfToken  // Add CSRF token to the request headers
             }
         })
         .then(response => {
