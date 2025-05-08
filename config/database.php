@@ -85,11 +85,11 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),  // Using Render's connection string
-            'host' => env('DB_HOST', 'dpg-cvvlbvrubrs73bibij0-a'),
+            'host' => env('DB_HOST', 'cbmNqNKye18B302C7Zn510U0bYXUrFTm'),
             'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'sanjoserhu'),
-            'username' => env('DB_USERNAME', 'sanjoserhu_user'),
-            'password' => env('DB_PASSWORD', 'rVVv3diX103I9Uy2MHKGQRg05xHwGU96'),
+            'database' => env('DB_DATABASE', 'iptproject'),
+            'username' => env('DB_USERNAME', 'iptproject_user'),
+            'password' => env('DB_PASSWORD', 'cbmNqNKye18B302C7Zn510U0bYXUrFTm'),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
