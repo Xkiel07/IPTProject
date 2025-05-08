@@ -52,11 +52,9 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     chown -R www-data:www-data /var/www/html && \
     chmod -R ug+rwx storage bootstrap/cache
 
-# Laravel post-setup
-RUN php artisan storage:link && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# Copy docker-entrypoint.sh and make it executable
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Start Apache with Laravel optimized
-CMD ["bash", "-c", "php artisan optimize && apache2-foreground"]
+# Set entrypoint to run the custom script
+CMD ["docker-entrypoint.sh"]
